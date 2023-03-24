@@ -1,0 +1,125 @@
+/* JDBC Connectivity Program. This program is about to work with database with MySql. 
+ * This below program is to get the value from user 1 or 2 (1 - Insert, 2 - Delete), 
+ * the data in database.
+ * 
+ * After getting the respective inputs, again it asks for no.of.times, so we can 
+ * give the necessary values.
+ */
+
+package task1;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Scanner;
+
+
+public class JDBC_Connections 
+{
+	public static Connection cn=null;
+	public static PreparedStatement ps=null;
+		
+	public static void main(String[] args) throws ClassNotFoundException, SQLException
+	{
+		try
+		{
+			System.out.print("Enter 1 for Insert data, 2 for Delete data : ");  //get value from the user
+			Scanner sc1 = new Scanner(System.in);
+			int option = 0;
+			option = sc1.nextInt();
+			
+			switch(option)
+			{
+			case 1: insert();
+				break;
+				
+			case 2: delete();
+			    break;
+			    			    
+			default:
+				System.out.println("Please check the number !!"); 	
+			}
+            sc1.close();		
+		 }
+		catch(Exception ex)
+		{
+			System.out.println(ex.getMessage());
+		}
+	}
+
+	
+	public static void DBConnection() throws ClassNotFoundException, SQLException  //Database connection method
+	{      
+		Class.forName("com.mysql.cj.jdbc.Driver");
+				
+		String path="jdbc:mysql://localhost:3306/JDBC?user=root&password=12345";
+		
+		cn=DriverManager.getConnection(path);
+	}
+	
+	public static void insert()throws ClassNotFoundException, SQLException   //Database Connection (Insert) Method
+	{
+	      DBConnection();
+          
+	      int emp_id = 0;
+	      String name;
+	      Double salary = 0.0;
+	      int n = 0;
+	      
+	      Scanner sc3 = new Scanner(System.in);
+	      System.out.print("Enter the no.of Employees : ");
+	      n = sc3.nextInt();
+	      
+	      for(int i = 1; i<=n; i++)
+	      {
+	      System.out.print("Enter Employee Id : ");
+	      emp_id = sc3.nextInt();
+	      
+	      System.out.print("Enter Employee Name : ");
+	      sc3.nextLine();    
+	      name = sc3.nextLine();  
+	      
+	      System.out.print("Enter Salary : ");
+	      salary = sc3.nextDouble();
+	     
+	      String ins="insert into employee values(?,?,?)";
+	      ps=cn.prepareStatement(ins);
+	      
+	      ps.setInt(1, emp_id);
+	      ps.setString(2, name);
+	      ps.setDouble(3, salary);
+	      	      
+	      long res = ps.executeUpdate();
+	      System.out.println("Inserted: " + res + " row");
+	      }
+	      //System.out.println("Inserted: " + res + " row"); //get total row inserted value in res
+	      sc3.close();
+	  }
+	
+	public static void delete()throws ClassNotFoundException, SQLException //Database Connection (Delete) Method
+	{
+		DBConnection();
+		int emp_id = 0;
+		int n = 0;
+		
+		Scanner sc2 = new Scanner(System.in);
+		System.out.print("Enter the no.of Employees : ");
+		n = sc2.nextInt();
+		
+		for(int i = 1;i<=n;i++)
+		{
+		System.out.print("Enter the Employee Id number : ");
+		emp_id = sc2.nextInt();	
+		
+		String del="delete from employee where emp_id=?";
+		ps=cn.prepareStatement(del);
+		
+		ps.setInt(1, emp_id);
+		
+		int res=ps.executeUpdate();
+		System.out.println("Deleted: "+ res + " row" );
+		}
+		sc2.close();
+	 }
+}
